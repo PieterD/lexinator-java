@@ -1,10 +1,14 @@
 package uk.org.binky.lexinator;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.util.LinkedList;
+import java.util.List;
 
 public abstract class Lexer<T extends Enum<T>> {
 	public final char EndOfText = '\u0003';
-	private final T tokenTypeEof;
 	private final T tokenTypeError;
 	private final T tokenTypeWarning;
 	
@@ -15,12 +19,68 @@ public abstract class Lexer<T extends Enum<T>> {
 	final LinkedList<Token<T>> tokens = new LinkedList<Token<T>>();
 	Mark mark = new Mark();
 	
-	Lexer(String name, CharSequence text, T tokenTypeEof, T tokenTypeError, T tokenTypeWarning) {
+	Lexer(String name, CharSequence text, T tokenTypeError, T tokenTypeWarning) {
 		this.name = name;
 		this.text = text;
-		this.tokenTypeEof = tokenTypeEof;
 		this.tokenTypeError = tokenTypeError;
 		this.tokenTypeWarning = tokenTypeWarning;
+	}
+	
+	Lexer(String name, CharSequence text, T tokenTypeError) {
+		this(name, text, tokenTypeError, null);
+	}
+	
+	private void step() {
+		if (state != null) {
+			State next = state.stateMethod();
+			state = next;
+		}
+	}
+	
+	void expect(int line, T type, String value) {
+		Token<T> token = getToken();
+		assertNotNull(token);
+		assertEquals(line, token.line);
+		assertEquals(type, token.type);
+		assertEquals(value, token.value);
+	}
+	
+	void expectEnd() {
+		Token<T> token = getToken();
+		assertNull(token);
+	}
+	
+	/**
+	 * Fetch the next token.
+	 * 
+	 * @return The next token
+	 */
+	Token<T> getToken() {
+		while(state != null) {
+			step();
+			Token<T> token = tokens.pollFirst();
+			if (token != null) {
+				return token;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Fetch all (remaining) tokens.
+	 * 
+	 * @return A list of all tokens remaining.
+	 */
+	List<Token<T>> getAllTokens() {
+		LinkedList<Token<T>> list = new LinkedList<Token<T>>();
+		while(true) {
+			Token<T> token = getToken();
+			if (token == null) {
+				break;
+			}
+			list.addLast(token);
+		}
+		return list;
 	}
 	
 	/**
@@ -91,16 +151,6 @@ public abstract class Lexer<T extends Enum<T>> {
 	}
 	
 	/**
-	 * Emit an EOF token.
-	 * 
-	 * @return null
-	 */
-	protected State emitEof() {
-		emitString(tokenTypeEof, "EOF");
-		return null;
-	}
-	
-	/**
 	 * Emit an error token.
 	 * 
 	 * @param format As String.format
@@ -113,13 +163,15 @@ public abstract class Lexer<T extends Enum<T>> {
 	}
 
 	/**
-	 * Emit a warning token.
+	 * Emit a warning token. Does nothing if no Warning token type was provided to the constructor.
 	 * 
 	 * @param format As String.format
 	 * @param args As String.format
 	 */
 	protected void warningf(String format, Object... args) {
-		emitString(tokenTypeWarning, String.format(format, args));
+		if (tokenTypeWarning != null) {
+			emitString(tokenTypeWarning, String.format(format, args));
+		}
 	}
 
 	/**
@@ -243,6 +295,7 @@ public abstract class Lexer<T extends Enum<T>> {
 			if (Character.isSpaceChar(c)) {
 				found = true;
 			} else {
+				back();
 				return found;
 			}
 		}

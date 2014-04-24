@@ -1,18 +1,75 @@
 package uk.org.binky.lexinator;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.LinkedList;
+import java.util.List;
+
 import org.junit.Test;
 
 
 public class LexerTest {
 	@Test
 	public void testBasic() {
-		new MyLexer(" hello = 123; bye = 456;");
+		MyLexer lexer = new MyLexer(" hello = 123; bye = 456;");
+		List<Token<MyLexer.Type>> tokens = lexer.getAllTokens();
+		List<Token<MyLexer.Type>> expect = new LinkedList<Token<MyLexer.Type>>();
+		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Variable, "hello"));
+		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Assign,   "="));
+		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Number,   "123"));
+		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Semi,     ";"));
+		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Variable, "bye"));
+		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Assign,   "="));
+		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Number,   "456"));
+		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Semi,     ";"));
+		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Eof,     "EOF"));
+		for (int i=0; i < expect.size(); i++) {
+			Token<MyLexer.Type> t = tokens.get(i);
+			Token<MyLexer.Type> e = expect.get(i);
+			assertNotNull(t);
+			assertNotNull(e);
+			System.out.printf("%d [%s]\n", i, t.value);
+			assertEquals(e.file, t.file);
+			assertEquals(e.line, t.line);
+			assertEquals(e.type, t.type);
+			assertEquals(e.value, t.value);
+		}
+		assertEquals(expect.size(), tokens.size());
+	}
+	
+	@Test
+	public void testExpect() {
+		MyLexer lexer;
+		lexer = new MyLexer("knack = 5;654");
+		lexer.expect(1, MyLexer.Type.Variable, "knack");
+		lexer.expect(1, MyLexer.Type.Assign,   "=");
+		lexer.expect(1, MyLexer.Type.Number,   "5");
+		lexer.expect(1, MyLexer.Type.Semi,     ";");
+		lexer.expect(1, MyLexer.Type.Error,    "Expected variable name!");
+		lexer.expectEnd();
+		
+		lexer = new MyLexer("knack = 5");
+		lexer.expect(1, MyLexer.Type.Variable, "knack");
+		lexer.expect(1, MyLexer.Type.Assign,   "=");
+		lexer.expect(1, MyLexer.Type.Number,   "5");
+		lexer.expect(1, MyLexer.Type.Error,    "Expected semicolon!");
+		lexer.expectEnd();
+		
+		lexer = new MyLexer("knack =");
+		lexer.expect(1, MyLexer.Type.Variable, "knack");
+		lexer.expect(1, MyLexer.Type.Assign,   "=");
+		lexer.expect(1, MyLexer.Type.Error,    "Expected number!");
+		
+		lexer = new MyLexer("knack");
+		lexer.expect(1, MyLexer.Type.Variable, "knack");
+		lexer.expect(1, MyLexer.Type.Error,    "Expected assignment character!");
 	}
 }
 
 class MyLexer extends Lexer<MyLexer.Type> {
 	MyLexer(String text) {
-		super("test", text, Type.Eof, Type.Error, Type.Warning);
+		super("test", text, Type.Error, Type.Warning);
 		this.state = stateVariable;
 	}
 	
@@ -24,6 +81,11 @@ class MyLexer extends Lexer<MyLexer.Type> {
 		Semi
 	}
 	
+	private State emitEof() {
+		emitString(Type.Eof, "EOF");
+		return null;
+	}
+
 	private final State stateVariable = new State() {
 		public State stateMethod() {
 			whitespace();
@@ -55,7 +117,7 @@ class MyLexer extends Lexer<MyLexer.Type> {
 		public State stateMethod() {
 			whitespace();
 			ignore();
-			if (!accept("123456789")) {
+			if (acceptRun("123456789") == 0) {
 				return errorf("Expected number!");
 			}
 			emit(Type.Number);
