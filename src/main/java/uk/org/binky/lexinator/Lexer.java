@@ -37,6 +37,13 @@ public abstract class Lexer<T extends Enum<T>> {
 		}
 	}
 	
+	/**
+	 * Test helper: fetch the next token, and assert its values.
+	 * 
+	 * @param line
+	 * @param type
+	 * @param value
+	 */
 	void expect(int line, T type, String value) {
 		Token<T> token = getToken();
 		assertNotNull(token);
@@ -45,6 +52,9 @@ public abstract class Lexer<T extends Enum<T>> {
 		assertEquals(value, token.value);
 	}
 	
+	/**
+	 * Test helper: assert that there are no more tokens.
+	 */
 	void expectEnd() {
 		Token<T> token = getToken();
 		assertNull(token);
