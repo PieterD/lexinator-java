@@ -19,18 +19,18 @@ public abstract class Lexer<T extends Enum<T>> {
 	final LinkedList<Token<T>> tokens = new LinkedList<Token<T>>();
 	Mark mark = new Mark();
 	
-	Lexer(String name, CharSequence text, T tokenTypeError, T tokenTypeWarning) {
+	public Lexer(String name, CharSequence text, T tokenTypeError, T tokenTypeWarning) {
 		this.name = name;
 		this.text = text;
 		this.tokenTypeError = tokenTypeError;
 		this.tokenTypeWarning = tokenTypeWarning;
 	}
 	
-	Lexer(String name, CharSequence text, T tokenTypeError) {
+	public Lexer(String name, CharSequence text, T tokenTypeError) {
 		this(name, text, tokenTypeError, null);
 	}
 	
-	private void step() {
+	void step() {
 		if (state != null) {
 			State next = state.stateMethod();
 			state = next;
@@ -44,7 +44,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param type
 	 * @param value
 	 */
-	void expect(int line, T type, String value) {
+	public void expect(int line, T type, String value) {
 		Token<T> token = getToken();
 		assertNotNull(token);
 		assertEquals(line, token.line);
@@ -55,7 +55,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	/**
 	 * Test helper: assert that there are no more tokens.
 	 */
-	void expectEnd() {
+	public void expectEnd() {
 		Token<T> token = getToken();
 		assertNull(token);
 	}
@@ -65,7 +65,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * 
 	 * @return The next token
 	 */
-	Token<T> getToken() {
+	public Token<T> getToken() {
 		while(state != null) {
 			step();
 			Token<T> token = tokens.pollFirst();
@@ -81,7 +81,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * 
 	 * @return A list of all tokens remaining.
 	 */
-	List<Token<T>> getAllTokens() {
+	public List<Token<T>> getAllTokens() {
 		LinkedList<Token<T>> list = new LinkedList<Token<T>>();
 		while(true) {
 			Token<T> token = getToken();
@@ -118,7 +118,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @return The current state
 	 */
 	protected Mark mark() {
-		return new Mark(this.mark);
+		return this.mark;
 	}
 	
 	
@@ -128,7 +128,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param mark The state being restored
 	 */
 	protected void unmark(Mark mark) {
-		this.mark = new Mark(mark);
+		this.mark = mark;
 	}
 	
 	/**
@@ -191,15 +191,10 @@ public abstract class Lexer<T extends Enum<T>> {
 	 */
 	protected char next() {
 		if (eof()) {
-			mark.width = 0;
 			return EndOfText;
 		}
 		char c = text.charAt(mark.pos);
-		mark.width = 1;
-		mark.pos++;
-		if (c == '\n') {
-			mark.line++;
-		}
+		mark = mark.next(c == '\n');
 		return c;
 	}
 	
@@ -207,8 +202,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * Undo the last next. Only works once.
 	 */
 	protected void back() {
-		mark.pos -= mark.width;
-		mark.width = 0;
+		mark = mark.back();
 	}
 	
 	/**
@@ -224,18 +218,17 @@ public abstract class Lexer<T extends Enum<T>> {
 	
 	/**
 	 * Ignore the string accumulated so far.
+	 * back() will not go back beyond this.
 	 */
 	protected void ignore() {
-		mark.start = mark.pos;
-		mark.width = 0;
+		mark = mark.ignore();
 	}
 	
 	/**
 	 * Restart the current token.
 	 */
 	protected void retry() {
-		mark.pos = mark.start;
-		mark.width = 0;
+		mark = mark.retry();
 	}
 	
 	/**
@@ -278,6 +271,9 @@ public abstract class Lexer<T extends Enum<T>> {
 	
 	protected boolean accept(String valid) {
 		char c = next();
+		if (c == EndOfText) {
+			return false;
+		}
 		for (int i=0; i<valid.length(); i++) {
 			if (valid.charAt(i) == c) {
 				return true;
@@ -295,14 +291,14 @@ public abstract class Lexer<T extends Enum<T>> {
 		return num;
 	}
 	
-	boolean whitespace() {
+	protected boolean whitespace() {
 		while(true) {
 			boolean found = false;
 			char c = next();
 			if (c == EndOfText) {
 				return found;
 			}
-			if (Character.isSpaceChar(c)) {
+			if (Character.isWhitespace(c)) {
 				found = true;
 			} else {
 				back();

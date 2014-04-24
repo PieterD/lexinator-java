@@ -12,18 +12,18 @@ import org.junit.Test;
 public class LexerTest {
 	@Test
 	public void testBasic() {
-		MyLexer lexer = new MyLexer(" hello = 123; bye = 456;");
+		MyLexer lexer = new MyLexer(" hello = 123;\nbye = 456;");
 		List<Token<MyLexer.Type>> tokens = lexer.getAllTokens();
 		List<Token<MyLexer.Type>> expect = new LinkedList<Token<MyLexer.Type>>();
 		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Variable, "hello"));
 		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Assign,   "="));
 		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Number,   "123"));
 		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Semi,     ";"));
-		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Variable, "bye"));
-		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Assign,   "="));
-		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Number,   "456"));
-		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Semi,     ";"));
-		expect.add(new Token<MyLexer.Type>("test", 1, MyLexer.Type.Eof,     "EOF"));
+		expect.add(new Token<MyLexer.Type>("test", 2, MyLexer.Type.Variable, "bye"));
+		expect.add(new Token<MyLexer.Type>("test", 2, MyLexer.Type.Assign,   "="));
+		expect.add(new Token<MyLexer.Type>("test", 2, MyLexer.Type.Number,   "456"));
+		expect.add(new Token<MyLexer.Type>("test", 2, MyLexer.Type.Semi,     ";"));
+		expect.add(new Token<MyLexer.Type>("test", 2, MyLexer.Type.Eof,      "EOF"));
 		for (int i=0; i < expect.size(); i++) {
 			Token<MyLexer.Type> t = tokens.get(i);
 			Token<MyLexer.Type> e = expect.get(i);
@@ -69,7 +69,7 @@ public class LexerTest {
 
 class MyLexer extends Lexer<MyLexer.Type> {
 	MyLexer(String text) {
-		super("test", text, Type.Error, Type.Warning);
+		super("test", text, Type.Error);
 		this.state = stateVariable;
 	}
 	
@@ -105,7 +105,7 @@ class MyLexer extends Lexer<MyLexer.Type> {
 		public State stateMethod() {
 			whitespace();
 			ignore();
-			if (!accept("=")) {
+			if (!string("=")) {
 				return errorf("Expected assignment character!");
 			}
 			emit(Type.Assign);
@@ -129,7 +129,7 @@ class MyLexer extends Lexer<MyLexer.Type> {
 		public State stateMethod() {
 			whitespace();
 			ignore();
-			if (!accept(";")) {
+			if (!string(";")) {
 				return errorf("Expected semicolon!");
 			}
 			emit(Type.Semi);
