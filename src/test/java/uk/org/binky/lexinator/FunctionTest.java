@@ -22,7 +22,7 @@ class FuncLexer extends Lexer<FuncLexer.Type> {
 	
 	FuncLexer() {
 		super("test", "ABtestingXYXYZ\nline2", Type.Error);
-		this.state = testState;
+		this.setState(testState);
 	}
 	
 	private final State testState = new State() {

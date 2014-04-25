@@ -10,7 +10,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	
 	final String name;
 	final CharSequence text;
-	State state = null;
+	private State state = null;
 	
 	final LinkedList<Token<T>> tokens = new LinkedList<Token<T>>();
 	Mark mark = new Mark();
@@ -24,6 +24,10 @@ public abstract class Lexer<T extends Enum<T>> {
 	
 	public Lexer(String name, CharSequence text, T tokenTypeError) {
 		this(name, text, tokenTypeError, null);
+	}
+
+	public void setState(State state) {
+		this.state = state;
 	}
 	
 	void step() {
