@@ -66,7 +66,8 @@ class FuncLexer extends Lexer<FuncLexer.Type> {
 			stored = mark();
 			
 			// TODO: test Exceptrun
-			assertTrue(string("ing"));
+			assertEquals(3, exceptRun("YX"));
+			//assertTrue(string("ing"));
 			ignore();
 			
 			assertFalse(find("spoopty"));
@@ -79,6 +80,12 @@ class FuncLexer extends Lexer<FuncLexer.Type> {
 			
 			unmark(stored);
 			assertEquals(1, mark.line);
+			
+			assertFalse(eof());
+			
+			assertEquals(14, exceptRun("QPD"));
+			
+			 assertTrue(eof());
 			
 			return null;
 		}

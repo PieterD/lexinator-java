@@ -291,6 +291,28 @@ public abstract class Lexer<T extends Enum<T>> {
 		return num;
 	}
 	
+	protected boolean except(String invalid) {
+		char c = next();
+		if (c == EndOfText) {
+			return false;
+		}
+		for (int i=0; i<invalid.length(); i++) {
+			if (invalid.charAt(i) == c) {
+				back();
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	protected int exceptRun(String invalid) {
+		int num = 0;
+		while (except(invalid)) {
+			num++;
+		}
+		return num;
+	}
+	
 	protected boolean whitespace() {
 		while(true) {
 			boolean found = false;
