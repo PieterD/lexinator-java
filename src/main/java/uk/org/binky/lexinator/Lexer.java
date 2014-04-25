@@ -1,7 +1,5 @@
 package uk.org.binky.lexinator;
 
-import static org.junit.Assert.assertNull;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -53,9 +51,11 @@ public abstract class Lexer<T extends Enum<T>> {
 	/**
 	 * Test helper: assert that there are no more tokens.
 	 */
-	public void expectEnd() {
+	public void expectEnd() throws ExpectException {
 		Token<T> token = getToken();
-		assertNull(token);
+		if (token != null) {
+			throw new ExpectException(token);
+		}
 	}
 	
 	/**

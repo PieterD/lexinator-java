@@ -29,7 +29,6 @@ public class LexerTest {
 			Token<MyLexer.Type> e = expect.get(i);
 			assertNotNull(t);
 			assertNotNull(e);
-			System.out.printf("%d [%s]\n", i, t.value);
 			assertEquals(e.file, t.file);
 			assertEquals(e.line, t.line);
 			assertEquals(e.type, t.type);
