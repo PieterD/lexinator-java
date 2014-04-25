@@ -314,20 +314,47 @@ public abstract class Lexer<T extends Enum<T>> {
 		}
 		return num;
 	}
-	
-	protected boolean whitespace() {
+
+	/**
+	 * Consumes whitespace.
+	 * If newline is false, it consumes all the whitespace it can find, returning true if it finds any.
+	 * If newline is true, it consumes all whitespace up to and including the first newline it can find.
+	 * If newline is true, it returns true if a newline was found or if the end of the text was reached, and false otherwise.
+	 * If newline is true, and no newline was found, then no characters are consumed.
+	 *
+	 * @param newline
+	 * @return
+	 */
+	protected boolean whitespace(boolean newline) {
+		Mark stored = mark();
+		boolean found = false;
 		while(true) {
-			boolean found = false;
 			char c = next();
 			if (c == EndOfText) {
-				return found;
+				return found || newline;
+			}
+			if (newline && c == '\n') {
+				return true;
 			}
 			if (Character.isWhitespace(c)) {
 				found = true;
 			} else {
+				if (newline) {
+					unmark(stored);
+					return false;
+				}
 				back();
 				return found;
 			}
 		}
+	}
+
+	/**
+	 * Same as whitespace(false)
+	 *
+	 * @return
+	 */
+	protected boolean whitespace() {
+		return whitespace(false);
 	}
 }
