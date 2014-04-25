@@ -11,4 +11,11 @@ public final class Token<T extends Enum<T>> {
 		this.type = type;
 		this.value = value;
 	}
+	
+	public boolean compare(Token<T> that) {
+		if (this.file != that.file || this.line != that.line || this.type != that.type || !this.value.equals(that.value)) {
+			return false;
+		}
+		return true;
+	}
 }

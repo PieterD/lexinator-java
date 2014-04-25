@@ -39,7 +39,7 @@ public class LexerTest {
 	}
 	
 	@Test
-	public void testExpect() {
+	public void testExpect() throws ExpectException {
 		MyLexer lexer;
 		lexer = new MyLexer("knack = 5;654");
 		lexer.expect(1, MyLexer.Type.Variable, "knack");
@@ -64,6 +64,13 @@ public class LexerTest {
 		lexer = new MyLexer("knack");
 		lexer.expect(1, MyLexer.Type.Variable, "knack");
 		lexer.expect(1, MyLexer.Type.Error,    "Expected assignment character!");
+	}
+	
+	@Test(expected = ExpectException.class)
+	public void testExpectFail() throws ExpectException {
+		MyLexer lexer;
+		lexer = new MyLexer("knack = 5;654");
+		lexer.expect(1, MyLexer.Type.Variable, "cracker");
 	}
 }
 

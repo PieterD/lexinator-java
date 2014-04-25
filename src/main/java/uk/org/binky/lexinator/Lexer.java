@@ -1,7 +1,5 @@
 package uk.org.binky.lexinator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.LinkedList;
@@ -44,13 +42,12 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param type
 	 * @param value
 	 */
-	public void expect(int line, T type, String value) {
+	public void expect(int line, T type, String value) throws ExpectException {
 		Token<T> token = getToken();
-		// TODO: Get rid of junit.
-		assertNotNull(token);
-		assertEquals(line, token.line);
-		assertEquals(type, token.type);
-		assertEquals(value, token.value);
+		Token<T> expect = new Token<T>(token.file, line, type, value);
+		if (! token.compare(expect)) {
+			throw new ExpectException(expect, token);
+		}
 	}
 	
 	/**
