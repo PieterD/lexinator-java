@@ -46,6 +46,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 */
 	public void expect(int line, T type, String value) {
 		Token<T> token = getToken();
+		// TODO: Get rid of junit.
 		assertNotNull(token);
 		assertEquals(line, token.line);
 		assertEquals(type, token.type);
