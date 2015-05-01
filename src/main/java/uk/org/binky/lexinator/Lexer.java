@@ -266,7 +266,12 @@ public abstract class Lexer<T extends Enum<T>> {
 		unmark(start);
 		return false;
 	}
-	
+
+	/**
+	 * Read a single character, as long as it is in valid.
+	 * @param valid The list of possible characters to accept.
+	 * @return True if a character was accepted, false otherwise.
+	 */
 	protected boolean accept(String valid) {
 		char c = next();
 		if (c == EndOfText) {
@@ -280,7 +285,13 @@ public abstract class Lexer<T extends Enum<T>> {
 		back();
 		return false;
 	}
-	
+
+	/**
+	 * Like accept, but it keeps reading until a character is found
+	 * that is not in the valid set.
+	 * @param valid The list of possible characters to accept.
+	 * @return The number of characters read.
+	 */
 	protected int acceptRun(String valid) {
 		int num = 0;
 		while (accept(valid)) {
@@ -288,7 +299,13 @@ public abstract class Lexer<T extends Enum<T>> {
 		}
 		return num;
 	}
-	
+
+	/**
+	 * The reverse of accept; read a single character, but only if
+	 * it is not in invalid.
+	 * @param invalid The list of characters to reject
+	 * @return True if a character was accepted, false otherwise.
+	 */
 	protected boolean except(String invalid) {
 		char c = next();
 		if (c == EndOfText) {
@@ -302,7 +319,13 @@ public abstract class Lexer<T extends Enum<T>> {
 		}
 		return true;
 	}
-	
+
+	/**
+	 * Like except, but for multiple characters.
+	 * It keeps calling except until it finds a character in invalid.
+	 * @param invalid The list of characters to reject
+	 * @return The number of characters read.
+	 */
 	protected int exceptRun(String invalid) {
 		int num = 0;
 		while (except(invalid)) {
@@ -310,7 +333,12 @@ public abstract class Lexer<T extends Enum<T>> {
 		}
 		return num;
 	}
-	
+
+	/**
+	 * Reads all kinds of whitespace, until a non-whitespace character is found.
+	 * As for what whitespace is, see Character.isWhitespace.
+	 * @return
+	 */
 	protected boolean whitespace() {
 		while(true) {
 			boolean found = false;
