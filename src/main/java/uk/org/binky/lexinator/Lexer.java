@@ -42,6 +42,9 @@ public abstract class Lexer<T extends Enum<T>> {
 	 */
 	public void expect(int line, T type, String value) throws ExpectException {
 		Token<T> token = getToken();
+		if (token == null) {
+			throw new ExpectException(new Token<T>("???", line, type, value), null);
+		}
 		Token<T> expect = new Token<T>(token.file, line, type, value);
 		if (! token.compare(expect)) {
 			throw new ExpectException(expect, token);
