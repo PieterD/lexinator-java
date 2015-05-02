@@ -10,7 +10,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	
 	final String name;
 	final CharSequence text;
-	State state = null;
+	protected State state = null;
 	
 	final LinkedList<Token<T>> tokens = new LinkedList<Token<T>>();
 	Mark mark = new Mark();
@@ -67,14 +67,12 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @return The next token
 	 */
 	public Token<T> getToken() {
-		while(state != null) {
+		Token<T> token = tokens.pollFirst();
+		while(token == null && state != null) {
 			step();
-			Token<T> token = tokens.pollFirst();
-			if (token != null) {
-				return token;
-			}
+			token = tokens.pollFirst();
 		}
-		return null;
+		return token;
 	}
 	
 	/**
