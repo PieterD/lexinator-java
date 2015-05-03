@@ -4,7 +4,7 @@ package uk.org.binky.lexinator;
 public final class Mark {
 	final int pos, line, start;
 	final Mark prev; 
-	Mark(int pos, int line, int start, Mark prev) {
+	Mark(final int pos, final int line, final int start, final Mark prev) {
 		this.pos = pos;
 		this.line = line;
 		this.start = start;
@@ -13,7 +13,7 @@ public final class Mark {
 	Mark() {
 		this(0, 1, 0, null);
 	};
-	Mark next(boolean isLine) {
+	Mark next(final boolean isLine) {
 		int addline = 0;
 		if (isLine) {
 			addline ++;

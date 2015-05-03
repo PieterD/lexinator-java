@@ -5,12 +5,12 @@ public final class ExpectException extends Exception {
 	private final Token<?> expected;
 	private final Token<?> received;
 
-	public ExpectException(Token<?> expected, Token<?> received) {
+	public ExpectException(final Token<?> expected, final Token<?> received) {
 		this.expected = expected;
 		this.received = received;
 	}
 
-	public ExpectException(Token<?> received) {
+	public ExpectException(final Token<?> received) {
 		this.expected = null;
 		this.received = received;
 	}

@@ -15,14 +15,14 @@ public abstract class Lexer<T extends Enum<T>> {
 	final LinkedList<Token<T>> tokens = new LinkedList<Token<T>>();
 	Mark mark = new Mark();
 	
-	public Lexer(String name, CharSequence text, T tokenTypeError, T tokenTypeWarning) {
+	public Lexer(final String name, final CharSequence text, final T tokenTypeError, final T tokenTypeWarning) {
 		this.name = name;
 		this.text = text;
 		this.tokenTypeError = tokenTypeError;
 		this.tokenTypeWarning = tokenTypeWarning;
 	}
 	
-	public Lexer(String name, CharSequence text, T tokenTypeError) {
+	public Lexer(final String name, final CharSequence text, final T tokenTypeError) {
 		this(name, text, tokenTypeError, null);
 	}
 	
@@ -40,12 +40,12 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param type
 	 * @param value
 	 */
-	public void expect(int line, T type, String value) throws ExpectException {
-		Token<T> token = getToken();
+	public void expect(final int line, final T type, final String value) throws ExpectException {
+		final Token<T> token = getToken();
 		if (token == null) {
 			throw new ExpectException(new Token<T>("???", line, type, value), null);
 		}
-		Token<T> expect = new Token<T>(token.file, line, type, value);
+		final Token<T> expect = new Token<T>(token.file, line, type, value);
 		if (! token.compare(expect)) {
 			throw new ExpectException(expect, token);
 		}
@@ -55,7 +55,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * Test helper: assert that there are no more tokens.
 	 */
 	public void expectEnd() throws ExpectException {
-		Token<T> token = getToken();
+		final Token<T> token = getToken();
 		if (token != null) {
 			throw new ExpectException(token);
 		}
@@ -81,9 +81,9 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @return A list of all tokens remaining.
 	 */
 	public List<Token<T>> getAllTokens() {
-		LinkedList<Token<T>> list = new LinkedList<Token<T>>();
+		final LinkedList<Token<T>> list = new LinkedList<Token<T>>();
 		while(true) {
-			Token<T> token = getToken();
+			final Token<T> token = getToken();
 			if (token == null) {
 				break;
 			}
@@ -126,7 +126,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * 
 	 * @param mark The state being restored
 	 */
-	protected void unmark(Mark mark) {
+	protected void unmark(final Mark mark) {
 		this.mark = mark;
 	}
 	
@@ -145,7 +145,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param type Token type
 	 * @param str Token string
 	 */
-	protected void emitString(T type, String str) {
+	protected void emitString(final T type, final String str) {
 		tokens.addLast(new Token<T>(name, mark.line, type, str));
 	}
 	
@@ -154,7 +154,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * 
 	 * @param type Token type
 	 */
-	protected void emit(T type) {
+	protected void emit(final T type) {
 		emitString(type, get());
 		ignore();
 	}
@@ -166,7 +166,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param args As string.format
 	 * @return null
 	 */
-	protected State errorf(String format, Object... args) {
+	protected State errorf(final String format, final Object... args) {
 		emitString(tokenTypeError, String.format(format, args));
 		return null;
 	}
@@ -177,7 +177,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param format As String.format
 	 * @param args As String.format
 	 */
-	protected void warningf(String format, Object... args) {
+	protected void warningf(final String format, final Object... args) {
 		if (tokenTypeWarning != null) {
 			emitString(tokenTypeWarning, String.format(format, args));
 		}
@@ -192,7 +192,7 @@ public abstract class Lexer<T extends Enum<T>> {
 		if (eof()) {
 			return EndOfText;
 		}
-		char c = text.charAt(mark.pos);
+		final char c = text.charAt(mark.pos);
 		mark = mark.next(c == '\n');
 		return c;
 	}
@@ -210,7 +210,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @return The next character to be read by next.
 	 */
 	protected char peek() {
-		char c = next();
+		final char c = next();
 		back();
 		return c;
 	}
@@ -236,11 +236,11 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param valid The string that must be matched completely.
 	 * @return True if a match occurred, false otherwise.
 	 */
-	protected boolean string(String valid) {
-		Mark start = mark();
+	protected boolean string(final String valid) {
+		final Mark start = mark();
 		for (int i=0; i<valid.length(); i++) {
-			char c = valid.charAt(i);
-			char n = next();
+			final char c = valid.charAt(i);
+			final char n = next();
 			if (n == EndOfText || n != c) {
 				unmark(start);
 				return false;
@@ -255,10 +255,10 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param valid The string being searched for.
 	 * @return True if a match occurred, false otherwise.
 	 */
-	protected boolean find(String valid) {
-		Mark start = mark();
+	protected boolean find(final String valid) {
+		final Mark start = mark();
 		do {
-			Mark v = mark();
+			final Mark v = mark();
 			if (string(valid)) {
 				unmark(v);
 				return true;
@@ -273,8 +273,8 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param valid The list of possible characters to accept.
 	 * @return True if a character was accepted, false otherwise.
 	 */
-	protected boolean accept(String valid) {
-		char c = next();
+	protected boolean accept(final String valid) {
+		final char c = next();
 		if (c == EndOfText) {
 			return false;
 		}
@@ -293,7 +293,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param valid The list of possible characters to accept.
 	 * @return The number of characters read.
 	 */
-	protected int acceptRun(String valid) {
+	protected int acceptRun(final String valid) {
 		int num = 0;
 		while (accept(valid)) {
 			num++;
@@ -307,8 +307,8 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param invalid The list of characters to reject
 	 * @return True if a character was accepted, false otherwise.
 	 */
-	protected boolean except(String invalid) {
-		char c = next();
+	protected boolean except(final String invalid) {
+		final char c = next();
 		if (c == EndOfText) {
 			return false;
 		}
@@ -327,7 +327,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param invalid The list of characters to reject
 	 * @return The number of characters read.
 	 */
-	protected int exceptRun(String invalid) {
+	protected int exceptRun(final String invalid) {
 		int num = 0;
 		while (except(invalid)) {
 			num++;
@@ -341,9 +341,9 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @return
 	 */
 	protected boolean whitespace() {
+		boolean found = false;
 		while(true) {
-			boolean found = false;
-			char c = next();
+			final char c = next();
 			if (c == EndOfText) {
 				return found;
 			}
