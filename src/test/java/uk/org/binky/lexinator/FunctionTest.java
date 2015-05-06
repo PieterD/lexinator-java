@@ -8,10 +8,62 @@ import org.junit.Test;
 
 public class FunctionTest {
 	@Test
+	public void Whitespace() {
+		WSLexer lexer = new WSLexer();
+		lexer.step();
+	}
+
+	@Test
 	public void Simple() {
 		FuncLexer lexer = new FuncLexer();
 		lexer.step();
 	}
+}
+
+class WSLexer extends Lexer<WSLexer.Type> {
+	enum Type {
+		Error,
+		Test
+	}
+
+	WSLexer() {
+		super("test", "hello\n  world  \nthere is nothing\n\tthere! ", Type.Error);
+		this.setState(testState);
+	}
+
+	private final State testState = new State() {
+		public State stateMethod() {
+			assertFalse(whitespace());
+			assertFalse(whitespace(true));
+			assertTrue(string("hello"));
+			assertTrue(whitespace(true));
+			assertEquals(' ', peek());
+			assertTrue(whitespace());
+			assertTrue(string("world"));
+			assertTrue(whitespace());
+			assertTrue(string("there"));
+			assertFalse(whitespace(true));
+			assertTrue(string(" "));
+			assertFalse(whitespace(true));
+			assertTrue(string("is"));
+			assertFalse(whitespace(true));
+			assertTrue(whitespace());
+			assertTrue(string("nothing"));
+			assertTrue(whitespace(true));
+			assertTrue(whitespace());
+			assertTrue(string("there!"));
+			Mark stored = mark();
+			assertTrue(whitespace());
+			assertTrue(eof());
+			assertFalse(whitespace());
+			assertTrue(whitespace(true));
+			unmark(stored);
+			assertTrue(whitespace(true));
+			assertTrue(eof());
+
+			return null;
+		}
+	};
 }
 
 class FuncLexer extends Lexer<FuncLexer.Type> {
@@ -22,7 +74,7 @@ class FuncLexer extends Lexer<FuncLexer.Type> {
 	
 	FuncLexer() {
 		super("test", "ABtestingXYXYZ\nline2", Type.Error);
-		this.state = testState;
+		this.setState(testState);
 	}
 	
 	private final State testState = new State() {
@@ -65,9 +117,7 @@ class FuncLexer extends Lexer<FuncLexer.Type> {
 			
 			stored = mark();
 			
-			// TODO: test Exceptrun
 			assertEquals(3, exceptRun("YX"));
-			//assertTrue(string("ing"));
 			ignore();
 			
 			assertFalse(find("spoopty"));

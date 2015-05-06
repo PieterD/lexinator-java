@@ -25,6 +25,10 @@ public abstract class Lexer<T extends Enum<T>> {
 	public Lexer(final String name, final CharSequence text, final T tokenTypeError) {
 		this(name, text, tokenTypeError, null);
 	}
+
+	public void setState(State state) {
+		this.state = state;
+	}
 	
 	void step() {
 		if (state != null) {
@@ -336,23 +340,45 @@ public abstract class Lexer<T extends Enum<T>> {
 	}
 
 	/**
-	 * Reads all kinds of whitespace, until a non-whitespace character is found.
-	 * As for what whitespace is, see Character.isWhitespace.
+	 * Consumes whitespace.
+	 * If newline is false, it consumes all the whitespace it can find, returning true if it finds any.
+	 * If newline is true, it consumes all whitespace up to and including the first newline it can find.
+	 * If newline is true, it returns true if a newline was found or if the end of the text was reached, and false otherwise.
+	 * If newline is true, and no newline was found, then no characters are consumed.
+	 *
+	 * @param newline
 	 * @return
 	 */
-	protected boolean whitespace() {
+	protected boolean whitespace(boolean newline) {
+		Mark stored = mark();
 		boolean found = false;
 		while(true) {
 			final char c = next();
 			if (c == EndOfText) {
-				return found;
+				return found || newline;
+			}
+			if (newline && c == '\n') {
+				return true;
 			}
 			if (Character.isWhitespace(c)) {
 				found = true;
 			} else {
+				if (newline) {
+					unmark(stored);
+					return false;
+				}
 				back();
 				return found;
 			}
 		}
+	}
+
+	/**
+	 * Same as whitespace(false)
+	 *
+	 * @return
+	 */
+	protected boolean whitespace() {
+		return whitespace(false);
 	}
 }
