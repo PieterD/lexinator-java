@@ -6,7 +6,7 @@
     <artifactId>lexinator</artifactId>
     <version>0.1.2</version>
     <packaging>jar</packaging>
-
+    <description>A lexing library</description>
     <name>lexinator</name>
     <url>https://github.com/PieterD/lexinator-java</url>
 
