@@ -76,7 +76,7 @@ public class LexerTest {
 class MyLexer extends Lexer<MyLexer.Type> {
 	MyLexer(String text) {
 		super("test", text, Type.Error);
-		this.state = stateVariable;
+		this.setState(stateVariable);
 	}
 	
 	enum Type {

@@ -17,5 +17,6 @@ public class ExpectExceptionTest {
 		Token<Type> t = new Token<Type>("quack", 100, Type.Boo, "menacing");
 		ExpectException exception = new ExpectException(e, t);
 		assertEquals("expected/received: file(file/quack) line(1/100) type(Test/Boo) value(value/menacing)", exception.toString());
+		assertEquals("expected nothing, got: file(quack) line(100) type(Boo) value(menacing)", new ExpectException(t).toString());
 	}
 }
