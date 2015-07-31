@@ -15,6 +15,15 @@ public abstract class Lexer<T extends Enum<T>> {
 	final LinkedList<Token<T>> tokens = new LinkedList<Token<T>>();
 	Mark mark = new Mark();
 	
+	/**
+	 * Start a Lexer for a file with the given name and contents.
+	 * Also provide a token type value for errors and warnings. 
+	 * 
+	 * @param name Name of the file being parsed
+	 * @param text Contents of the file being parsed
+	 * @param tokenTypeError Type value for errors
+	 * @param tokenTypeWarning Type value for warnings
+	 */
 	public Lexer(final String name, final CharSequence text, final T tokenTypeError, final T tokenTypeWarning) {
 		this.name = name;
 		this.text = text;
@@ -22,6 +31,13 @@ public abstract class Lexer<T extends Enum<T>> {
 		this.tokenTypeWarning = tokenTypeWarning;
 	}
 	
+	/**
+	 * Same as Lexer(name, text, tokenTypeError, null)
+	 * 
+	 * @param name Name of the file being parsed
+	 * @param text Contents of the file being parsed
+	 * @param tokenTypeError Type value for errors
+	 */
 	public Lexer(final String name, final CharSequence text, final T tokenTypeError) {
 		this(name, text, tokenTypeError, null);
 	}
@@ -40,9 +56,10 @@ public abstract class Lexer<T extends Enum<T>> {
 	/**
 	 * Test helper: fetch the next token, and assert its values.
 	 * 
-	 * @param line
-	 * @param type
-	 * @param value
+	 * @param line Expected line number.
+	 * @param type Expected token type.
+	 * @param value Expected token contents.
+	 * @throws ExpectException if the token failed to match the given arguments.
 	 */
 	public void expect(final int line, final T type, final String value) throws ExpectException {
 		final Token<T> token = getToken();
@@ -274,6 +291,7 @@ public abstract class Lexer<T extends Enum<T>> {
 
 	/**
 	 * Read a single character, as long as it is in valid.
+	 * 
 	 * @param valid The list of possible characters to accept.
 	 * @return True if a character was accepted, false otherwise.
 	 */
@@ -294,6 +312,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	/**
 	 * Like accept, but it keeps reading until a character is found
 	 * that is not in the valid set.
+	 * 
 	 * @param valid The list of possible characters to accept.
 	 * @return The number of characters read.
 	 */
@@ -308,6 +327,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	/**
 	 * The reverse of accept; read a single character, but only if
 	 * it is not in invalid.
+	 * 
 	 * @param invalid The list of characters to reject
 	 * @return True if a character was accepted, false otherwise.
 	 */
@@ -328,7 +348,8 @@ public abstract class Lexer<T extends Enum<T>> {
 	/**
 	 * Like except, but for multiple characters.
 	 * It keeps calling except until it finds a character in invalid.
-	 * @param invalid The list of characters to reject
+	 * 
+	 * @param invalid The list of characters to reject.
 	 * @return The number of characters read.
 	 */
 	protected int exceptRun(final String invalid) {
@@ -347,7 +368,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * If newline is true, and no newline was found, then no characters are consumed.
 	 *
 	 * @param newline
-	 * @return
+	 * @return true if any whitespace was consumed.
 	 */
 	protected boolean whitespace(boolean newline) {
 		Mark stored = mark();
@@ -376,7 +397,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	/**
 	 * Same as whitespace(false)
 	 *
-	 * @return
+	 * @return true if any whitespace was consumed.
 	 */
 	protected boolean whitespace() {
 		return whitespace(false);
