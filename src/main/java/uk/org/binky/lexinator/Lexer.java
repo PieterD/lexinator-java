@@ -74,6 +74,8 @@ public abstract class Lexer<T extends Enum<T>> {
 	
 	/**
 	 * Test helper: assert that there are no more tokens.
+	 * 
+	 * @throws ExpectException if a token was read, instead of nothing.
 	 */
 	public void expectEnd() throws ExpectException {
 		final Token<T> token = getToken();
@@ -367,7 +369,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * If newline is true, it returns true if a newline was found or if the end of the text was reached, and false otherwise.
 	 * If newline is true, and no newline was found, then no characters are consumed.
 	 *
-	 * @param newline
+	 * @param newline Whether newlines are included in whitespace.
 	 * @return true if any whitespace was consumed.
 	 */
 	protected boolean whitespace(boolean newline) {
