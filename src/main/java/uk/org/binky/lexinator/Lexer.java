@@ -363,6 +363,8 @@ public abstract class Lexer<T extends Enum<T>> {
 	}
 
 	/**
+	 * This is too complicated. Don't use this. I don't know what I was thinking. See space().
+	 * 
 	 * Consumes whitespace.
 	 * If newline is false, it consumes all the whitespace it can find, returning true if it finds any.
 	 * If newline is true, it consumes all whitespace up to and including the first newline it can find.
@@ -372,6 +374,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param newline Whether newlines are included in whitespace.
 	 * @return true if any whitespace was consumed.
 	 */
+	@Deprecated
 	protected boolean whitespace(boolean newline) {
 		Mark stored = mark();
 		boolean found = false;
@@ -397,11 +400,52 @@ public abstract class Lexer<T extends Enum<T>> {
 	}
 
 	/**
-	 * Same as whitespace(false)
+	 * This one is not too complicated, but the other one is. Deprecate both, see space().
+	 * 
+	 * Consumes all the whitespace it can find, returning true if it finds any.
 	 *
 	 * @return true if any whitespace was consumed.
 	 */
+	@Deprecated
 	protected boolean whitespace() {
 		return whitespace(false);
+	}
+
+	private boolean space(final boolean newline) {
+		boolean found = false;
+		while (true) {
+			final char c = next();
+			if (c == EndOfText) {
+				return found;
+			}
+			if (newline && c == '\n') {
+				back();
+				return found;
+			}
+			if (Character.isWhitespace(c)) {
+				found = true;
+			} else {
+				back();
+				return found;
+			}
+		}
+	}
+	
+	/**
+	 * Consumes all the whitespace it can find. Returns true if it finds any.
+	 *
+	 * @return true if any whitespace was consumed.
+	 */
+	protected boolean space() {
+		return space(true);
+	}
+	
+	/**
+	 * Consumes all the whitespace it can find, except newlines. Returns true if it finds any.
+	 *
+	 * @return true if any whitespace was consumed.
+	 */
+	protected boolean spaceNoLine() {
+		return space(false);
 	}
 }

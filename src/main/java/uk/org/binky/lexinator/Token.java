@@ -5,7 +5,7 @@ public final class Token<T extends Enum<T>> {
 	public final int line;
 	public final T type;
 	public final String value;
-	Token(final String file, final int line, final T type, final String value) {
+	public Token(final String file, final int line, final T type, final String value) {
 		this.file = file;
 		this.line = line;
 		this.type = type;
