@@ -32,6 +32,18 @@ public class IsolatedFunctionTest {
 	}
 	
 	@Test
+	public void testNoWayBack() {
+		final FunctionHelper h = new FunctionHelper("12");
+		h.back();
+		assertEquals('1', h.next());
+		h.back();
+		assertEquals('1', h.next());
+		h.back();
+		h.back();
+		assertEquals('1', h.next());
+	}
+	
+	@Test
 	public void testNextNewline() {
 		final FunctionHelper h = new FunctionHelper("1\n2");
 		assertEquals('1', h.next());
@@ -80,12 +92,45 @@ public class IsolatedFunctionTest {
 	@Test
 	public void testLen() {
 		final FunctionHelper h = new FunctionHelper("1234");
+		assertEquals(0, h.len());
 		h.next();
+		assertEquals(1, h.len());
 		h.next();
+		assertEquals(2, h.len());
 		h.next();
 		assertEquals(3, h.len());
 	}
 
+	@Test
+	public void testRetry() {
+		final FunctionHelper h = new FunctionHelper("12345");
+		assertEquals('1', h.next());
+		assertEquals(1, h.len());
+		h.ignore();
+		assertEquals('2', h.next());
+		assertEquals('3', h.next());
+		assertEquals(2, h.len());
+		h.retry();
+		assertEquals(0, h.len());
+		assertEquals('2', h.next());
+	}
+	
+	@Test
+	public void testIgnore() {
+		final FunctionHelper h = new FunctionHelper("12345");
+		assertEquals('1', h.next());
+		assertEquals(1, h.len());
+		h.ignore();
+		assertEquals('2', h.next());
+		assertEquals('3', h.next());
+		assertEquals(2, h.len());
+		h.ignore();
+		assertEquals(0, h.len());
+		assertEquals('4', h.next());
+		assertEquals('5', h.next());
+		assertEquals("45", h.get());
+	}
+	
 	@Test
 	public void testMarkUnmark() {
 		final FunctionHelper h = new FunctionHelper("12345");
@@ -166,6 +211,70 @@ public class IsolatedFunctionTest {
 		assertEquals('\n', h.next());
 		assertEquals('Y', h.next());
 		assertFalse(h.spaceNoLine());
+	}
+	
+	@Test
+	public void testString() {
+		final FunctionHelper h = new FunctionHelper("1abc2");
+		assertFalse(h.string("abc"));
+		assertEquals('1', h.next());
+		assertTrue(h.string("abc"));
+		assertFalse(h.string("abc"));
+		assertEquals('2', h.next());
+		assertFalse(h.string("abc"));
+	}
+	
+	@Test
+	public void testFind() {
+		final FunctionHelper h = new FunctionHelper("123123abc123");
+		assertFalse(h.find("abcd"));
+		assertTrue(h.find("123"));
+		assertEquals(0, h.len());
+		assertTrue(h.find("abc"));
+		assertEquals("123123", h.get());
+		h.ignore();
+		assertTrue(h.find("123"));
+		assertEquals("abc", h.get());
+	}
+	
+	@Test
+	public void testWhitespace() {
+		final FunctionHelper h = new FunctionHelper("X \t\nY");
+		assertFalse(h.whitespace());
+		assertEquals('X', h.next());
+		assertTrue(h.whitespace());
+		assertFalse(h.whitespace());
+		assertEquals('Y', h.next());
+		assertFalse(h.whitespace());
+	}
+	
+	@Test
+	public void testWhitespaceNewline() {
+		final FunctionHelper h = new FunctionHelper("X \t\n\t Y\t\tZ");
+		assertFalse(h.whitespace(true));
+		assertEquals('X', h.next());
+		assertTrue(h.whitespace(true));
+		assertEquals('\t', h.next());
+		assertEquals(' ', h.next());
+		assertEquals('Y', h.next());
+		assertFalse(h.whitespace(true));
+		assertEquals('\t', h.next());
+		assertEquals('\t', h.next());
+		assertEquals('Z', h.next());
+		assertTrue(h.whitespace(true));
+	}
+	
+	@Test
+	public void testWhitespaceEndOfText() {
+		final FunctionHelper h = new FunctionHelper(" ");
+		h.ignore();
+		assertTrue(h.whitespace(false));
+		h.ignore();
+		assertTrue(h.whitespace(true));
+		h.ignore();
+		h.next();
+		assertFalse(h.whitespace(false));
+		assertTrue(h.whitespace(true));
 	}
 }
 
