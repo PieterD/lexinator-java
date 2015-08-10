@@ -238,6 +238,7 @@ public class IsolatedFunctionTest {
 	}
 	
 	@Test
+	@Deprecated
 	public void testWhitespace() {
 		final FunctionHelper h = new FunctionHelper("X \t\nY");
 		assertFalse(h.whitespace());
@@ -249,6 +250,7 @@ public class IsolatedFunctionTest {
 	}
 	
 	@Test
+	@Deprecated
 	public void testWhitespaceNewline() {
 		final FunctionHelper h = new FunctionHelper("X \t\n\t Y\t\tZ");
 		assertFalse(h.whitespace(true));
@@ -265,6 +267,7 @@ public class IsolatedFunctionTest {
 	}
 	
 	@Test
+	@Deprecated
 	public void testWhitespaceEndOfText() {
 		final FunctionHelper h = new FunctionHelper(" ");
 		h.ignore();
