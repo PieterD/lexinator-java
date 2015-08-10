@@ -94,7 +94,7 @@ class MyLexer extends Lexer<MyLexer.Type> {
 
 	private final State stateVariable = new State() {
 		public State stateMethod() {
-			whitespace();
+			space();
 			ignore();
 			if (eof()) {
 				return emitEof();
@@ -109,7 +109,7 @@ class MyLexer extends Lexer<MyLexer.Type> {
 	
 	private final State stateAssign = new State() {
 		public State stateMethod() {
-			whitespace();
+			space();
 			ignore();
 			if (!string("=")) {
 				return errorf("Expected assignment character!");
@@ -121,7 +121,7 @@ class MyLexer extends Lexer<MyLexer.Type> {
 	
 	private final State stateNumber = new State() {
 		public State stateMethod() {
-			whitespace();
+			space();
 			ignore();
 			if (acceptRun("123456789") == 0) {
 				return errorf("Expected number!");
@@ -133,7 +133,7 @@ class MyLexer extends Lexer<MyLexer.Type> {
 	
 	private final State stateSemi = new State() {
 		public State stateMethod() {
-			whitespace();
+			space();
 			ignore();
 			if (!string(";")) {
 				return errorf("Expected semicolon!");
