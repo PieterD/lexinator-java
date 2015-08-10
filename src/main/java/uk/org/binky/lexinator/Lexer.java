@@ -437,7 +437,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @return true if any whitespace was consumed.
 	 */
 	protected boolean space() {
-		return space(true);
+		return space(false);
 	}
 	
 	/**
@@ -446,6 +446,6 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @return true if any whitespace was consumed.
 	 */
 	protected boolean spaceNoLine() {
-		return space(false);
+		return space(true);
 	}
 }

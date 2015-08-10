@@ -5,4 +5,4 @@
 - [x] Make Token constructor public.
 - [x] Deprecated whitespace().
 - [x] Added space() and spaceNoLine().
-- [ ] Added isolated tests for each Lexer function.
+- [x] Added isolated tests for each Lexer function.
