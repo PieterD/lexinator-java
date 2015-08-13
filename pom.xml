@@ -5,7 +5,7 @@
 
 	<groupId>uk.org.binky</groupId>
 	<artifactId>lexinator</artifactId>
-	<version>0.1.4</version>
+	<version>0.2.0</version>
 	<packaging>jar</packaging>
 	<description>A lexing library. The design is essentially Rob Pike's lexer from his talk "Lexical Scanning in Go"</description>
 	<name>lexinator</name>

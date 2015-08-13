@@ -1,6 +1,10 @@
 package uk.org.binky.lexinator;
 
 
+/**
+ * This class represents the current state of the input text.
+ * It contains the position, start, line number, and the previous state.
+ */
 public final class Mark {
 	final int pos, line, start;
 	final Mark prev; 

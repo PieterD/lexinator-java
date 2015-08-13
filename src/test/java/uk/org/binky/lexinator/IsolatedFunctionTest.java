@@ -236,49 +236,6 @@ public class IsolatedFunctionTest {
 		assertTrue(h.find("123"));
 		assertEquals("abc", h.get());
 	}
-	
-	@Test
-	@Deprecated
-	public void testWhitespace() {
-		final FunctionHelper h = new FunctionHelper("X \t\nY");
-		assertFalse(h.whitespace());
-		assertEquals('X', h.next());
-		assertTrue(h.whitespace());
-		assertFalse(h.whitespace());
-		assertEquals('Y', h.next());
-		assertFalse(h.whitespace());
-	}
-	
-	@Test
-	@Deprecated
-	public void testWhitespaceNewline() {
-		final FunctionHelper h = new FunctionHelper("X \t\n\t Y\t\tZ");
-		assertFalse(h.whitespace(true));
-		assertEquals('X', h.next());
-		assertTrue(h.whitespace(true));
-		assertEquals('\t', h.next());
-		assertEquals(' ', h.next());
-		assertEquals('Y', h.next());
-		assertFalse(h.whitespace(true));
-		assertEquals('\t', h.next());
-		assertEquals('\t', h.next());
-		assertEquals('Z', h.next());
-		assertTrue(h.whitespace(true));
-	}
-	
-	@Test
-	@Deprecated
-	public void testWhitespaceEndOfText() {
-		final FunctionHelper h = new FunctionHelper(" ");
-		h.ignore();
-		assertTrue(h.whitespace(false));
-		h.ignore();
-		assertTrue(h.whitespace(true));
-		h.ignore();
-		h.next();
-		assertFalse(h.whitespace(false));
-		assertTrue(h.whitespace(true));
-	}
 }
 
 class FunctionHelper extends Lexer<FunctionHelper.Type> {

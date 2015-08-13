@@ -3,17 +3,28 @@ package uk.org.binky.lexinator;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Implements a basic FSM-style Lexer.
+ * When extending this class, no methods should be overridden.
+ * In the constructor, after super, make sure you call setState,
+ * so that the Lexer knows which state to start with.
+ *
+ * @param <T> The token type to use (must contain at least an error value, given to the constructor)
+ */
 public abstract class Lexer<T extends Enum<T>> {
-	public final char EndOfText = '\u0003';
+	/**
+	 * This is returned by next() when the end of the text is reached.
+	 */
+	public static final char EndOfText = '\u0003';
+
 	private final T tokenTypeError;
 	private final T tokenTypeWarning;
-	
-	final String name;
-	final CharSequence text;
-	protected State state = null;
-	
-	final LinkedList<Token<T>> tokens = new LinkedList<Token<T>>();
-	Mark mark = new Mark();
+	private final String name;
+	private final CharSequence text;
+
+	private final LinkedList<Token<T>> tokens = new LinkedList<Token<T>>();
+	private State state = null;
+	private Mark mark = new Mark();
 	
 	/**
 	 * Start a Lexer for a file with the given name and contents.
@@ -24,7 +35,7 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param tokenTypeError Type value for errors
 	 * @param tokenTypeWarning Type value for warnings
 	 */
-	public Lexer(final String name, final CharSequence text, final T tokenTypeError, final T tokenTypeWarning) {
+	protected Lexer(final String name, final CharSequence text, final T tokenTypeError, final T tokenTypeWarning) {
 		this.name = name;
 		this.text = text;
 		this.tokenTypeError = tokenTypeError;
@@ -38,19 +49,19 @@ public abstract class Lexer<T extends Enum<T>> {
 	 * @param text Contents of the file being parsed
 	 * @param tokenTypeError Type value for errors
 	 */
-	public Lexer(final String name, final CharSequence text, final T tokenTypeError) {
+	protected Lexer(final String name, final CharSequence text, final T tokenTypeError) {
 		this(name, text, tokenTypeError, null);
 	}
 
-	public void setState(State state) {
+	/**
+	 * Set the initial state of the Lexer. This should be called from
+	 * the constructor; since the default is null, it will otherwise
+	 * stop immediately.
+	 *
+	 * @param state The initial state function to use
+	 */
+	protected void setState(State state) {
 		this.state = state;
-	}
-	
-	void step() {
-		if (state != null) {
-			State next = state.stateMethod();
-			state = next;
-		}
 	}
 	
 	/**
@@ -97,7 +108,14 @@ public abstract class Lexer<T extends Enum<T>> {
 		}
 		return token;
 	}
-	
+
+	private void step() {
+		if (state != null) {
+			State next = state.stateMethod();
+			state = next;
+		}
+	}
+
 	/**
 	 * Fetch all (remaining) tokens.
 	 * 
@@ -362,55 +380,6 @@ public abstract class Lexer<T extends Enum<T>> {
 		return num;
 	}
 
-	/**
-	 * This is too complicated. Don't use this. I don't know what I was thinking. See space().
-	 * 
-	 * Consumes whitespace.
-	 * If newline is false, it consumes all the whitespace it can find, returning true if it finds any.
-	 * If newline is true, it consumes all whitespace up to and including the first newline it can find.
-	 * If newline is true, it returns true if a newline was found or if the end of the text was reached, and false otherwise.
-	 * If newline is true, and no newline was found, then no characters are consumed.
-	 *
-	 * @param newline Whether newlines are included in whitespace.
-	 * @return true if any whitespace was consumed.
-	 */
-	@Deprecated
-	protected boolean whitespace(boolean newline) {
-		Mark stored = mark();
-		boolean found = false;
-		while(true) {
-			final char c = next();
-			if (c == EndOfText) {
-				return found || newline;
-			}
-			if (newline && c == '\n') {
-				return true;
-			}
-			if (Character.isWhitespace(c)) {
-				found = true;
-			} else {
-				if (newline) {
-					unmark(stored);
-					return false;
-				}
-				back();
-				return found;
-			}
-		}
-	}
-
-	/**
-	 * This one is not too complicated, but the other one is. Deprecate both, see space().
-	 * 
-	 * Consumes all the whitespace it can find, returning true if it finds any.
-	 *
-	 * @return true if any whitespace was consumed.
-	 */
-	@Deprecated
-	protected boolean whitespace() {
-		return whitespace(false);
-	}
-
 	private boolean space(final boolean newline) {
 		boolean found = false;
 		while (true) {
@@ -430,7 +399,7 @@ public abstract class Lexer<T extends Enum<T>> {
 			}
 		}
 	}
-	
+
 	/**
 	 * Consumes all the whitespace it can find. Returns true if it finds any.
 	 *
