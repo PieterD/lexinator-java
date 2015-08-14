@@ -30,7 +30,37 @@ public class IsolatedFunctionTest {
 		assertEquals('2', h.next());
 		assertEquals(h.EndOfText, h.next());
 	}
-	
+
+	@Test
+	public void testBackLargeOp() {
+		final FunctionHelper h = new FunctionHelper("12345");
+		assertEquals('1', h.next());
+		assertEquals('2', h.next());
+		assertEquals(true, h.string("34"));
+		h.back();
+		assertEquals('4', h.next());
+	}
+
+	@Test
+	public void testMultiBack() {
+		final FunctionHelper h = new FunctionHelper("12345");
+		assertEquals('1', h.next());
+		assertEquals('2', h.next());
+		assertEquals('3', h.next());
+		assertEquals('4', h.next());
+		h.back();
+		h.back();
+		assertEquals('3', h.next());
+		h.back();
+		h.back();
+		assertEquals('2', h.next());
+		assertEquals('3', h.next());
+		h.back();
+		h.back();
+		h.back();
+		assertEquals('1', h.next());
+	}
+
 	@Test
 	public void testNoWayBack() {
 		final FunctionHelper h = new FunctionHelper("12");

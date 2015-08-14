@@ -239,7 +239,8 @@ public abstract class Lexer<T extends Enum<T>> {
 	}
 	
 	/**
-	 * Undo the last next. Only works once.
+	 * Undo the last next. Can be used multiple times, undoes an operation each time,
+	 * but only back until the last retry, or any of the emitting methods.
 	 */
 	protected void back() {
 		mark = mark.back();
