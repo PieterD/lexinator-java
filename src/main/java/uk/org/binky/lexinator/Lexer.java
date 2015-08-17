@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @param <T> The token type to use (must contain at least an error value, given to the constructor)
  */
-public abstract class Lexer<T extends Enum<T>> implements Tokenizer {
+public abstract class Lexer<T extends Enum<T>> implements Tokenizer<T> {
 	/**
 	 * This is returned by next() when the end of the text is reached.
 	 */
