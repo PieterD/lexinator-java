@@ -11,7 +11,7 @@ import java.util.List;
  *
  * @param <T> The token type to use (must contain at least an error value, given to the constructor)
  */
-public abstract class Lexer<T extends Enum<T>> {
+public abstract class Lexer<T extends Enum<T>> implements Tokenizer {
 	/**
 	 * This is returned by next() when the end of the text is reached.
 	 */
@@ -63,38 +63,34 @@ public abstract class Lexer<T extends Enum<T>> {
 	protected void setState(State state) {
 		this.state = state;
 	}
-	
+
 	/**
+	 * Deprecated; use the Expect class instead.
+	 *
 	 * Test helper: fetch the next token, and assert its values.
-	 * 
+	 *
 	 * @param line Expected line number.
 	 * @param type Expected token type.
 	 * @param value Expected token contents.
 	 * @throws ExpectException if the token failed to match the given arguments.
 	 */
+	@Deprecated
 	public void expect(final int line, final T type, final String value) throws ExpectException {
-		final Token<T> token = getToken();
-		if (token == null) {
-			throw new ExpectException(new Token<T>("???", line, type, value), null);
-		}
-		final Token<T> expect = new Token<T>(token.file, line, type, value);
-		if (! token.compare(expect)) {
-			throw new ExpectException(expect, token);
-		}
+		new Expect<T>(this).expect(line, type, value);
 	}
-	
+
 	/**
+	 * Deprecated; use the Expect class instead.
+	 *
 	 * Test helper: assert that there are no more tokens.
-	 * 
+	 *
 	 * @throws ExpectException if a token was read, instead of nothing.
 	 */
+	@Deprecated
 	public void expectEnd() throws ExpectException {
-		final Token<T> token = getToken();
-		if (token != null) {
-			throw new ExpectException(token);
-		}
+		new Expect<T>(this).expectEnd();
 	}
-	
+
 	/**
 	 * Fetch the next token.
 	 * 

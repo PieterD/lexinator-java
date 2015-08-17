@@ -39,37 +39,40 @@ public class LexerTest {
 	
 	@Test
 	public void testExpect() throws ExpectException {
-		MyLexer lexer;
-		lexer = new MyLexer("knack = 5;654");
-		lexer.expect(1, MyLexer.Type.Variable, "knack");
-		lexer.expect(1, MyLexer.Type.Assign,   "=");
-		lexer.expect(1, MyLexer.Type.Number,   "5");
-		lexer.expect(1, MyLexer.Type.Semi,     ";");
-		lexer.expect(1, MyLexer.Type.Error,    "Expected variable name!");
-		lexer.expectEnd();
+		Expect<MyLexer.Type> e;
+		e = getExpect("knack = 5;643");
+		e.expect(1, MyLexer.Type.Variable, "knack");
+		e.expect(1, MyLexer.Type.Assign,   "=");
+		e.expect(1, MyLexer.Type.Number,   "5");
+		e.expect(1, MyLexer.Type.Semi,     ";");
+		e.expect(1, MyLexer.Type.Error,    "Expected variable name!");
+		e.expectEnd();
 		
-		lexer = new MyLexer("knack = 5");
-		lexer.expect(1, MyLexer.Type.Variable, "knack");
-		lexer.expect(1, MyLexer.Type.Assign,   "=");
-		lexer.expect(1, MyLexer.Type.Number,   "5");
-		lexer.expect(1, MyLexer.Type.Error,    "Expected semicolon!");
-		lexer.expectEnd();
+		e = getExpect("knack = 5");
+		e.expect(1, MyLexer.Type.Variable, "knack");
+		e.expect(1, MyLexer.Type.Assign,   "=");
+		e.expect(1, MyLexer.Type.Number,   "5");
+		e.expect(1, MyLexer.Type.Error,    "Expected semicolon!");
+		e.expectEnd();
 		
-		lexer = new MyLexer("knack =");
-		lexer.expect(1, MyLexer.Type.Variable, "knack");
-		lexer.expect(1, MyLexer.Type.Assign,   "=");
-		lexer.expect(1, MyLexer.Type.Error,    "Expected number!");
+		e = getExpect("knack =");
+		e.expect(1, MyLexer.Type.Variable, "knack");
+		e.expect(1, MyLexer.Type.Assign,   "=");
+		e.expect(1, MyLexer.Type.Error,    "Expected number!");
 		
-		lexer = new MyLexer("knack");
-		lexer.expect(1, MyLexer.Type.Variable, "knack");
-		lexer.expect(1, MyLexer.Type.Error,    "Expected assignment character!");
+		e = getExpect("knack");
+		e.expect(1, MyLexer.Type.Variable, "knack");
+		e.expect(1, MyLexer.Type.Error,    "Expected assignment character!");
 	}
 	
 	@Test(expected = ExpectException.class)
 	public void testExpectFail() throws ExpectException {
-		MyLexer lexer;
-		lexer = new MyLexer("knack = 5;654");
-		lexer.expect(1, MyLexer.Type.Variable, "cracker");
+		Expect<MyLexer.Type> e = getExpect("knack = 5;654");
+		e.expect(1, MyLexer.Type.Variable, "cracker");
+	}
+
+	public Expect<MyLexer.Type> getExpect(final String content) {
+		return new Expect<MyLexer.Type>(new MyLexer(content));
 	}
 }
 
